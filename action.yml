@@ -41,10 +41,5 @@ runs:
               echo "setting config"
               sudo wg-quick up /etc/wireguard/wg0.conf
               sleep 5
-              sudo wg show
-              sudo wg showconf wg0
-              sudo ifconfig
-              sudo ip address
-              sudo ip r
           shell: bash
 
