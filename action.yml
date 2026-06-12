@@ -44,7 +44,7 @@ runs:
               sudo wg show
               sudo wg showconf wg0
               sudo ifconfig
-              sudo ip a
+              sudo ip address
               sudo ip r
           shell: bash
 
