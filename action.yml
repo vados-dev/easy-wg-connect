@@ -10,14 +10,32 @@ runs:
     using: composite
     steps:
         - run: |
-              sudo apt install resolvconf
-              sudo apt install wireguard
-              echo "${{ inputs.WG_CONFIG }}" > wg0.conf
-              sudo chmod 600 wg0.conf
+              echo "update system"
+              sudo apt update -y
+              echo "install resolvconf and wireguard"
+              sudo apt install -y resolvconf wireguard
+              echo "add sysctl variables"
+              sudo sysctl -w net.ipv4.ip_forward=1
+              sudo sysctl -w net.ipv4.conf.all.src_valid_mark=1
+              sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+              sudo sysctl -w net.ipv6.conf.all.forwarding=1
+              sudo sysctl -w net.ipv6.conf.default.forwarding=1
+              echo "net.ipv4.ip_forward=1" | sudo tee /etc/sysctl.conf
+              echo "net.ipv4.conf.all.src_valid_mark=1" | sudo tee /etc/sysctl.conf
+              echo "ipv6.conf.all.disable_ipv6=1" | sudo tee /etc/sysctl.conf
+              echo "net.ipv6.conf.all.forwarding=1" | sudo tee /etc/sysctl.conf
+              echo "net.ipv6.conf.default.forwarding=1" | sudo tee /etc/sysctl.conf
+              echo "load sysctl variables"
+              sudo sysctl -p /etc/sysctl.conf
+              echo "write wireguard config"
+              echo "${{ inputs.WG_CONFIG }}" > ~/wg-easy/wg0.conf
+              sudo cat /etc/wireguard/wg0.conf
+              echo "set permissions"
+              sudo chmod 600 /etc/wireguard/wg0.conf
               echo "setting config"
-              sudo wg-quick up ./wg0.conf
+              sudo wg-quick up /etc/wireguard/wg0.conf
+              sleep 5
+              sudo wg show
+              sudo wg showconf wg0
           shell: bash
 
-branding:
-  icon: shield
-  color: red
